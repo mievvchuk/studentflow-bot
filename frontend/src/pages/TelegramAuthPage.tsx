@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 import { TOKEN_KEY } from "../api/client";
@@ -41,8 +42,9 @@ export default function TelegramAuthPage() {
         const result = await telegramAuth(initData);
         localStorage.setItem(TOKEN_KEY, result.access_token);
         navigate("/dashboard", { replace: true });
-      } catch {
-        setError("Telegram authentication failed. Check BOT_TOKEN and Mini App settings.");
+      } catch (authError) {
+        const detail = axios.isAxiosError(authError) ? authError.response?.data?.detail : null;
+        setError(typeof detail === "string" ? detail : "Telegram authentication failed. Check BOT_TOKEN and Mini App settings.");
       }
     }
 
