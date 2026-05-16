@@ -25,15 +25,19 @@ async def start(message: Message) -> None:
     )
 
 
-async def main() -> None:
-    logging.basicConfig(level=logging.INFO)
-    bot = Bot(token=settings.bot_token)
+def create_dispatcher() -> Dispatcher:
     dispatcher = Dispatcher()
     dispatcher.message.register(start, CommandStart())
     dispatcher.message.filter(F.chat.type == "private")
+    return dispatcher
+
+
+async def main() -> None:
+    logging.basicConfig(level=logging.INFO)
+    bot = Bot(token=settings.bot_token)
+    dispatcher = create_dispatcher()
     await dispatcher.start_polling(bot)
 
 
 if __name__ == "__main__":
     asyncio.run(main())
-

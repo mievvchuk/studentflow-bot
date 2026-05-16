@@ -63,6 +63,8 @@ Set:
 - `JWT_EXPIRES_MINUTES`
 - `MINI_APP_URL`
 - `BACKEND_CORS_ORIGINS`
+- `WEBHOOK_BASE_URL` for deployed Telegram webhook mode
+- `ENABLE_INTEGRATED_SCHEDULER` for running reminders inside the FastAPI process
 
 Frontend:
 
@@ -161,6 +163,87 @@ Then configure BotFather Mini App/Menu Button URL to:
 ```text
 https://studentflow.example.com
 ```
+
+## Free Deploy: Vercel + Koyeb + Supabase
+
+This is the recommended free MVP setup:
+
+- Supabase Free for PostgreSQL
+- Koyeb Free for the FastAPI backend, Telegram webhook, and integrated scheduler
+- Vercel Hobby for the Mini App frontend
+
+### 1. Supabase
+
+Create a Supabase project and copy the PostgreSQL connection string. Use the pooled connection string if Supabase offers one.
+
+### 2. Koyeb Backend
+
+Create a Koyeb web service from the GitHub repository.
+
+Settings:
+
+```text
+Root directory: backend
+Build command: pip install -r requirements.txt
+Run command: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+Koyeb environment variables:
+
+```env
+DATABASE_URL=your_supabase_postgres_url
+BOT_TOKEN=your_botfather_token
+JWT_SECRET=your_long_random_secret
+JWT_ALGORITHM=HS256
+JWT_EXPIRES_MINUTES=43200
+MINI_APP_URL=https://your-frontend.vercel.app
+BACKEND_CORS_ORIGINS=https://your-frontend.vercel.app
+WEBHOOK_BASE_URL=https://your-backend.koyeb.app
+ENABLE_INTEGRATED_SCHEDULER=true
+```
+
+`WEBHOOK_BASE_URL` tells FastAPI to register Telegram webhook automatically at:
+
+```text
+https://your-backend.koyeb.app/telegram/webhook
+```
+
+### 3. Vercel Frontend
+
+Create a Vercel project from the same GitHub repository.
+
+Settings:
+
+```text
+Root directory: frontend
+Build command: npm run build
+Output directory: dist
+```
+
+Vercel environment variables:
+
+```env
+VITE_API_URL=https://your-backend.koyeb.app
+```
+
+After Vercel gives you the frontend URL, update Koyeb:
+
+```env
+MINI_APP_URL=https://your-frontend.vercel.app
+BACKEND_CORS_ORIGINS=https://your-frontend.vercel.app
+```
+
+Redeploy Koyeb after changing these values.
+
+### 4. BotFather
+
+Set the Mini App/Menu Button URL to:
+
+```text
+https://your-frontend.vercel.app
+```
+
+Then open your bot in Telegram, send `/start`, and press `Open StudentFlow`.
 
 ## Run Locally
 

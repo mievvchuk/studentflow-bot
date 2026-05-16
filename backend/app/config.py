@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     mini_app_url: str = Field(default="http://localhost:5173", alias="MINI_APP_URL")
     backend_cors_origins: str = Field(default="http://localhost:5173", alias="BACKEND_CORS_ORIGINS")
     jwt_expires_minutes: int = Field(default=60 * 24 * 30, alias="JWT_EXPIRES_MINUTES")
+    webhook_base_url: str | None = Field(default=None, alias="WEBHOOK_BASE_URL")
+    enable_integrated_scheduler: bool = Field(default=False, alias="ENABLE_INTEGRATED_SCHEDULER")
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
@@ -23,4 +25,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-
