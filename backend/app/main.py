@@ -23,9 +23,9 @@ async def lifespan(app: FastAPI):
         scheduler.add_job(send_weekly_group_summaries, "cron", day_of_week="sun", hour=18, minute=0, max_instances=1)
         scheduler.start()
 
-    if settings.webhook_base_url:
+    if settings.telegram_webhook_base_url:
         webhook_bot = Bot(token=settings.bot_token)
-        webhook_url = f"{settings.webhook_base_url.rstrip('/')}/telegram/webhook"
+        webhook_url = f"{settings.telegram_webhook_base_url.rstrip('/')}/telegram/webhook"
         await webhook_bot.set_webhook(webhook_url, drop_pending_updates=True)
 
     try:

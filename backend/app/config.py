@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     backend_cors_origins: str = Field(default="http://localhost:5173", alias="BACKEND_CORS_ORIGINS")
     jwt_expires_minutes: int = Field(default=60 * 24 * 30, alias="JWT_EXPIRES_MINUTES")
     webhook_base_url: str | None = Field(default=None, alias="WEBHOOK_BASE_URL")
+    render_external_url: str | None = Field(default=None, alias="RENDER_EXTERNAL_URL")
     enable_integrated_scheduler: bool = Field(default=False, alias="ENABLE_INTEGRATED_SCHEDULER")
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
@@ -20,6 +21,10 @@ class Settings(BaseSettings):
     @property
     def cors_origins(self) -> list[str]:
         return [origin.strip() for origin in self.backend_cors_origins.split(",") if origin.strip()]
+
+    @property
+    def telegram_webhook_base_url(self) -> str | None:
+        return self.webhook_base_url or self.render_external_url
 
 
 @lru_cache

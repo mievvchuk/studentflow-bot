@@ -245,6 +245,85 @@ https://your-frontend.vercel.app
 
 Then open your bot in Telegram, send `/start`, and press `Open StudentFlow`.
 
+## Free Deploy: Vercel + Render + Supabase
+
+This option uses Render's free web service instead of Koyeb. Render can create the backend from `render.yaml` in this repository.
+
+### 1. Render Backend
+
+Create a new Render Blueprint from the GitHub repository:
+
+```text
+https://github.com/mievvchuk/studentflow-bot
+```
+
+Render reads `render.yaml` and creates the `studentflow-bot-api` web service.
+
+When Render asks for secret values, set:
+
+```env
+DATABASE_URL=your_supabase_postgres_url
+BOT_TOKEN=your_botfather_token
+```
+
+The service uses:
+
+```text
+Build command: pip install -r requirements.txt
+Start command: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+After deploy, copy the Render backend URL. It will look like:
+
+```text
+https://studentflow-bot-api.onrender.com
+```
+
+Render provides this URL to the app as `RENDER_EXTERNAL_URL`, so the backend automatically registers the Telegram webhook at:
+
+```text
+https://studentflow-bot-api.onrender.com/telegram/webhook
+```
+
+### 2. Vercel Frontend
+
+Create a Vercel project from the same GitHub repository.
+
+Settings:
+
+```text
+Root directory: frontend
+Build command: npm run build
+Output directory: dist
+```
+
+Vercel environment variables:
+
+```env
+VITE_API_URL=https://studentflow-bot-api.onrender.com
+```
+
+### 3. Update Render URLs
+
+After Vercel gives you the frontend URL, update the Render service environment variables:
+
+```env
+MINI_APP_URL=https://your-frontend.vercel.app
+BACKEND_CORS_ORIGINS=https://your-frontend.vercel.app
+```
+
+Redeploy Render after changing them.
+
+### 4. BotFather
+
+Set the Mini App/Menu Button URL to:
+
+```text
+https://your-frontend.vercel.app
+```
+
+Free Render services can sleep when inactive, so the first request after a pause can be slow. For MVP testing this is acceptable, but reminders are more reliable on a paid always-on service.
+
 ## Run Locally
 
 Use Python 3.12 for the backend. Python 3.14 is too new for some native dependencies used by Pydantic/FastAPI in this MVP.
