@@ -1,0 +1,237 @@
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+
+type Language = "en" | "uk";
+
+const STORAGE_KEY = "studentflow_language";
+
+const uk: Record<string, string> = {
+  "Mini App": "Міні-додаток",
+  Home: "Головна",
+  Subjects: "Предмети",
+  Labs: "Лаби",
+  Tracks: "Треки",
+  Leaders: "Лідери",
+  Calendar: "Календар",
+  Profile: "Профіль",
+  Today: "Сьогодні",
+  "Welcome back": "З поверненням",
+  Hi: "Привіт",
+  student: "студенте",
+  Retry: "Спробувати ще раз",
+  "Loading dashboard": "Завантаження дашборду",
+  "Dashboard is unavailable": "Дашборд недоступний",
+  "No dashboard data": "Немає даних для дашборду",
+  "Create subjects, labs, and study tracks to fill this view.": "Створи предмети, лаби та навчальні треки, щоб заповнити цей екран.",
+  "Track labs, deadlines, reminders, and your programming study progress from one mobile workspace.": "Керуй лабами, дедлайнами, нагадуваннями та прогресом у програмуванні з одного мобільного простору.",
+  "Upcoming deadlines": "Найближчі дедлайни",
+  "Nearest labs first": "Спочатку найближчі лаби",
+  "View labs": "Дивитись лаби",
+  "No upcoming labs": "Немає найближчих лаб",
+  "Add a lab with a deadline to see it here.": "Додай лабу з дедлайном, щоб вона зʼявилась тут.",
+  "Study tracks": "Навчальні треки",
+  "Programming roadmap progress": "Прогрес навчального маршруту",
+  "View tracks": "Дивитись треки",
+  "No active tracks": "Немає активних треків",
+  "Create a study track for technologies you want to learn.": "Створи навчальний трек для технологій, які хочеш вивчити.",
+  Subject: "Предмет",
+  Track: "Трек",
+  Lab: "Лаба",
+  "Group labs by course, module, or university subject.": "Групуй лаби за курсом, модулем або університетським предметом.",
+  Title: "Назва",
+  Description: "Опис",
+  Color: "Колір",
+  "Used as the subject accent.": "Використовується як акцент предмета.",
+  Algorithms: "Алгоритми",
+  "Lab work and lectures": "Лаби та лекції",
+  Create: "Створити",
+  Save: "Зберегти",
+  "Use at least 2 characters.": "Використай мінімум 2 символи.",
+  "Loading subjects": "Завантаження предметів",
+  "Could not load subjects": "Не вдалося завантажити предмети",
+  "No subjects yet": "Предметів ще немає",
+  "Create your first subject to organize labs and deadlines.": "Створи перший предмет, щоб організувати лаби та дедлайни.",
+  "No description": "Немає опису",
+  "Track work status, deadlines, links, tasks, and reminders.": "Відстежуй статус роботи, дедлайни, посилання, завдання та нагадування.",
+  "Status filter": "Фільтр статусу",
+  "All statuses": "Усі статуси",
+  "Subject filter": "Фільтр предмета",
+  "All subjects": "Усі предмети",
+  "Filters update the list instantly.": "Фільтри оновлюють список миттєво.",
+  Deadline: "Дедлайн",
+  "Initial status": "Початковий статус",
+  "Create lab": "Створити лабу",
+  "Lab 3: REST API": "Лаба 3: REST API",
+  "Loading labs": "Завантаження лаб",
+  "Could not load labs": "Не вдалося завантажити лаби",
+  "No labs found": "Лаби не знайдені",
+  "Create a lab or adjust the current filters.": "Створи лабу або зміни поточні фільтри.",
+  "No subject": "Без предмета",
+  "Loading lab": "Завантаження лаби",
+  "Could not load lab": "Не вдалося завантажити лабу",
+  "Lab not found": "Лабу не знайдено",
+  "This lab may have been deleted.": "Можливо, цю лабу видалили.",
+  Status: "Статус",
+  "Move the lab through your workflow.": "Переміщуй лабу своїм робочим процесом.",
+  "Tasks checklist": "Чекліст завдань",
+  "New task": "Нове завдання",
+  "No checklist tasks": "У чеклісті немає завдань",
+  "Add small steps to make the lab easier to finish.": "Додай маленькі кроки, щоб легше завершити лабу.",
+  "Reminder settings": "Налаштування нагадувань",
+  "Telegram reminders are sent once.": "Telegram-нагадування надсилаються один раз.",
+  When: "Коли",
+  Message: "Повідомлення",
+  "Create reminder": "Створити нагадування",
+  sent: "надіслано",
+  pending: "очікує",
+  of: "з",
+  "Submit lab report": "Здати звіт по лабі",
+  "Related work for this subject.": "Роботи, повʼязані з цим предметом.",
+  "Loading subject": "Завантаження предмета",
+  "Could not load subject": "Не вдалося завантажити предмет",
+  "Subject not found": "Предмет не знайдено",
+  "This subject may have been deleted.": "Можливо, цей предмет видалили.",
+  "Loading subject labs": "Завантаження лаб предмета",
+  "No labs for this subject": "Для цього предмета немає лаб",
+  "Create a lab and assign it to this subject.": "Створи лабу та привʼяжи її до цього предмета.",
+  "Plan technologies and learning tasks across your programming path.": "Плануй технології та навчальні завдання у своєму шляху програміста.",
+  "Track title": "Назва треку",
+  "Backend roadmap": "Backend-маршрут",
+  "FastAPI, SQL, testing": "FastAPI, SQL, тестування",
+  "Loading study tracks": "Завантаження навчальних треків",
+  "Could not load study tracks": "Не вдалося завантажити навчальні треки",
+  "No study tracks yet": "Навчальних треків ще немає",
+  "Create a roadmap for technologies you are learning.": "Створи маршрут для технологій, які вивчаєш.",
+  "Loading study track": "Завантаження навчального треку",
+  "Could not load study track": "Не вдалося завантажити навчальний трек",
+  "Study track not found": "Навчальний трек не знайдено",
+  "This track may have been deleted.": "Можливо, цей трек видалили.",
+  "Overall progress": "Загальний прогрес",
+  "Edit progress": "Змінити прогрес",
+  "0 to 100 percent": "Від 0 до 100 відсотків",
+  Technologies: "Технології",
+  "Technology title": "Назва технології",
+  complete: "виконано",
+  "Progress and learning tasks inside this track.": "Прогрес і навчальні завдання в цьому треку.",
+  "Loading technologies": "Завантаження технологій",
+  "Could not load technologies": "Не вдалося завантажити технології",
+  "No technologies in this track": "У цьому треку немає технологій",
+  "Load tasks": "Завантажити завдання",
+  "Learning task": "Навчальне завдання",
+  "Labs grouped by deadline date for quick mobile scanning.": "Лаби згруповані за датою дедлайну для швидкого перегляду з телефона.",
+  "Loading calendar": "Завантаження календаря",
+  "Could not load calendar": "Не вдалося завантажити календар",
+  "No lab deadlines": "Немає дедлайнів лаб",
+  "Labs with deadlines will appear grouped by date.": "Лаби з дедлайнами зʼявляться тут, згруповані за датою.",
+  "Telegram account data used by StudentFlow.": "Дані Telegram-акаунта, які використовує StudentFlow.",
+  "Loading profile": "Завантаження профілю",
+  "Profile is unavailable": "Профіль недоступний",
+  "Sign in from Telegram to load your profile.": "Увійди через Telegram, щоб завантажити профіль.",
+  "Telegram user": "Користувач Telegram",
+  "Sign out": "Вийти",
+  "Telegram-only access for labs, tracks, and reminders.": "Доступ тільки через Telegram для лаб, треків і нагадувань.",
+  "Signing in with Telegram": "Вхід через Telegram",
+  "Authentication failed": "Автентифікація не вдалася",
+  "Open this page from the Telegram Mini App to authenticate.": "Відкрий цю сторінку з Telegram Mini App, щоб увійти.",
+  "Telegram did not provide initData. Open the app from the bot's Mini App button, not from a pasted link.": "Telegram не передав initData. Відкрий додаток через кнопку Mini App у боті, а не через вставлене посилання.",
+  "Telegram authentication failed. Check BOT_TOKEN and Mini App settings.": "Автентифікація Telegram не вдалася. Перевір BOT_TOKEN і налаштування Mini App.",
+  Gamification: "Гейміфікація",
+  "Weekly leaderboard": "Тижневий рейтинг",
+  "Compete with your student group using labs, learning tasks, streaks, and weekly points.": "Змагайся зі своєю студентською групою через лаби, навчальні завдання, серії та тижневі бали.",
+  "Current group": "Поточна група",
+  "Auto-select group": "Автоматично вибрати групу",
+  Scoring: "Нарахування балів",
+  "+10 on-time lab, +3 late lab, +2 learning task, +5 weekly streak.": "+10 за лабу вчасно, +3 за лабу із запізненням, +2 за навчальне завдання, +5 за тижневу серію.",
+  "Create team": "Створити команду",
+  "Start a leaderboard and share its invite code.": "Запусти рейтинг і поділись кодом запрошення.",
+  "Team name": "Назва команди",
+  "CS-23 Backend Team": "CS-23 Backend Team",
+  Optional: "Необовʼязково",
+  "Create group": "Створити групу",
+  "Join team": "Приєднатись до команди",
+  "Use an invite code from a classmate.": "Використай код запрошення від одногрупника.",
+  "Invite code": "Код запрошення",
+  "Join group": "Приєднатись",
+  "Create institution": "Створити заклад",
+  "Add a school, college, or university for your teams.": "Додай школу, коледж або університет для своїх команд.",
+  "Institution name": "Назва закладу",
+  "Kyiv Polytechnic Institute": "Київський політехнічний інститут",
+  "Institution type": "Тип закладу",
+  school: "школа",
+  college: "коледж",
+  university: "університет",
+  City: "Місто",
+  Country: "Країна",
+  Kyiv: "Київ",
+  Ukraine: "Україна",
+  "Join institution": "Приєднатись до закладу",
+  "Use an institution invite code from your teacher or admin.": "Використай код запрошення закладу від викладача або адміністратора.",
+  "Institution invite code": "Код запрошення закладу",
+  "My institutions": "Мої заклади",
+  "No institutions yet": "Закладів ще немає",
+  Institution: "Заклад",
+  "No institution": "Без закладу",
+  "Enter an invite code.": "Введи код запрошення.",
+  "Loading leaderboard": "Завантаження рейтингу",
+  "Could not load groups": "Не вдалося завантажити групи",
+  "Could not load leaderboard": "Не вдалося завантажити рейтинг",
+  "My rank": "Моє місце",
+  "My points": "Мої бали",
+  "On time": "Вчасно",
+  Late: "Із запізненням",
+  Podium: "Подіум",
+  "No points yet": "Балів ще немає",
+  "Complete labs or learning tasks this week to enter the podium.": "Завершуй лаби або навчальні завдання цього тижня, щоб потрапити на подіум.",
+  "Weekly ranking": "Тижневий рейтинг",
+  "Full group ranking for the current week.": "Повний рейтинг групи за поточний тиждень.",
+  "No group yet": "Групи ще немає",
+  "Create or join a group to unlock the weekly leaderboard.": "Створи групу або приєднайся до неї, щоб відкрити тижневий рейтинг.",
+  "on time": "вчасно",
+  late: "із запізненням",
+  tasks: "завдань",
+  pts: "балів",
+  "not started": "не почато",
+  "in progress": "в процесі",
+  completed: "завершено",
+  submitted: "здано",
+  "No deadline": "Без дедлайну",
+  "No date": "Без дати"
+};
+
+interface I18nContextValue {
+  language: Language;
+  setLanguage: (language: Language) => void;
+  t: (text: string) => string;
+}
+
+const I18nContext = createContext<I18nContextValue | null>(null);
+
+function initialLanguage(): Language {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored === "uk" || stored === "en" ? stored : "en";
+}
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguageState] = useState<Language>(initialLanguage);
+
+  const value = useMemo<I18nContextValue>(() => {
+    const setLanguage = (next: Language) => {
+      localStorage.setItem(STORAGE_KEY, next);
+      setLanguageState(next);
+    };
+    return {
+      language,
+      setLanguage,
+      t: (text: string) => (language === "uk" ? uk[text] ?? text : text)
+    };
+  }, [language]);
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+}
+
+export function useI18n() {
+  const context = useContext(I18nContext);
+  if (!context) {
+    throw new Error("useI18n must be used inside LanguageProvider");
+  }
+  return context;
+}
