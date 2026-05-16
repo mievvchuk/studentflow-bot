@@ -139,6 +139,7 @@ const uk: Record<string, string> = {
   "Telegram initData expired": "Telegram initData застарів. Закрий Mini App і відкрий його через кнопку бота ще раз.",
   "Telegram user is missing": "Telegram не передав дані користувача.",
   "Invalid Telegram user payload": "Telegram передав некоректні дані користувача.",
+  "Backend auth request failed. Check VITE_API_URL and CORS.": "Запит авторизації до backend не пройшов. Перевір VITE_API_URL і CORS.",
   Gamification: "Гейміфікація",
   "Weekly leaderboard": "Тижневий рейтинг",
   "Compete with your student group using labs, learning tasks, streaks, and weekly points.": "Змагайся зі своєю студентською групою через лаби, навчальні завдання, серії та тижневі бали.",

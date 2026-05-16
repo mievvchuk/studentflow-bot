@@ -43,8 +43,17 @@ export default function TelegramAuthPage() {
         localStorage.setItem(TOKEN_KEY, result.access_token);
         navigate("/dashboard", { replace: true });
       } catch (authError) {
-        const detail = axios.isAxiosError(authError) ? authError.response?.data?.detail : null;
-        setError(typeof detail === "string" ? detail : "Telegram authentication failed. Check BOT_TOKEN and Mini App settings.");
+        if (axios.isAxiosError(authError)) {
+          const detail = authError.response?.data?.detail;
+          const status = authError.response?.status;
+          if (typeof detail === "string") {
+            setError(detail);
+            return;
+          }
+          setError(status ? `Backend auth request failed with HTTP ${status}.` : "Backend auth request failed. Check VITE_API_URL and CORS.");
+          return;
+        }
+        setError("Telegram authentication failed. Check BOT_TOKEN and Mini App settings.");
       }
     }
 
